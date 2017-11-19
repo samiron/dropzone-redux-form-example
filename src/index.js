@@ -11,7 +11,10 @@ const reducer = combineReducers({
 });
 
 function configureStore(initialState) {
-  return createStore(reducer, initialState);
+  return createStore(
+    reducer, 
+    initialState,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 }
 
 const store = configureStore({});
