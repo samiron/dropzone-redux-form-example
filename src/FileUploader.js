@@ -1,9 +1,22 @@
-import React, { Component, PropTypes, } from 'react';
-import { reduxForm, Field } from 'redux-form';
+import React, { Component } from 'react';
+// import PropTypes from 'prop-types';
+import { reduxForm, Field, FieldArray } from 'redux-form';
 import Dropzone from 'react-dropzone';
 
 const FILE_FIELD_NAME = 'uploaded_files';
 
+/**
+ * A file object returned by dropzone looks like below
+ * {
+ *     lastModified:1497889130402
+ *     lastModifiedDate:Mon Jun 19 2017 22:18:50 GMT+0600 (Bangladesh Standard Time) {}
+ *     name: "spaul_cropped_right_edited.jpg",
+ *     preview: "blob:http://localhost:3000/31119cb8-dd85-49f0-8492-d793df5e0ee3"
+ *     size: 178508
+ *     type: "image/jpeg"
+ *     webkitRelativePath:""
+ * }
+ */
 const DropzoneFileInput = ({name, onChangeHandler}) => {
   return (
     <Dropzone
@@ -18,10 +31,11 @@ const DropzoneFileInput = ({name, onChangeHandler}) => {
 /**
  * This will the component of redux-form Field
  * The value MUST be initialized as empty array.
+ * Is usable with redux-form Field variable.
  * @param {*} input 
  * @param {*} props 
  */
-const multiFilesInput = ({input, meta, ...props}) => { 
+const MultiFilesWithSingleField = ({input, meta, ...props}) => { 
   const allFiles = input.value || [];
 
   const onChangeHandler = (newSelectedFiles, e) => {
@@ -30,25 +44,6 @@ const multiFilesInput = ({input, meta, ...props}) => {
     console.log(newSelectedFiles, e);
     console.log("----------------------------------");
 
-    /**
-     * lastModified:1497889130402
-     * lastModifiedDate:Mon Jun 19 2017 22:18:50 GMT+0600 (Bangladesh Standard Time) {}
-     *name
-:
-"spaul_cropped_right_edited.jpg"
-preview
-:
-"blob:http://localhost:3000/31119cb8-dd85-49f0-8492-d793df5e0ee3"
-size
-:
-178508
-type
-:
-"image/jpeg"
-webkitRelativePath
-:
-""
-     */
     const filesAsObject = newSelectedFiles.map((file, index) => {
       return {
         name: file.name + "some random text",
@@ -73,6 +68,12 @@ webkitRelativePath
     </div>
   )
 }
+
+const MultiFilesWithFielArray = () => {
+  
+}
+
+
 
 class FileUploader extends Component {
 
@@ -104,7 +105,7 @@ class FileUploader extends Component {
           <label htmlFor={FILE_FIELD_NAME}>Files</label>
           <Field
             name={FILE_FIELD_NAME}
-            component={multiFilesInput}
+            component={MultiFilesWithSingleField}
           />
         </div>
         <div>
@@ -119,12 +120,12 @@ class FileUploader extends Component {
     );
   }
 
-  static propTypes = {
-    handleSubmit: PropTypes.func.isRequired,
-    reset: PropTypes.func.isRequired,
-  };
-
 }
+
+// FileUploader.propTypes = {
+//   handleSubmit: PropTypes.func.isRequired,
+//   reset: PropTypes.func.isRequired,
+// };
 
 export default reduxForm({
   form: 'simple',
