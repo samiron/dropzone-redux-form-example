@@ -4,6 +4,7 @@ import { reduxForm, Field, FieldArray } from 'redux-form';
 import Dropzone from 'react-dropzone';
 
 const FILE_FIELD_NAME = 'uploaded_files';
+const FILE_FIELD_ARRAY_NAME = 'uploaded_file_array';
 
 /**
  * A file object returned by dropzone looks like below
@@ -17,7 +18,7 @@ const FILE_FIELD_NAME = 'uploaded_files';
  *     webkitRelativePath:""
  * }
  */
-const DropzoneFileInput = ({name, onChangeHandler}) => {
+const DropzoneFileInput = ({ name, onChangeHandler, ...props }) => {
   return (
     <Dropzone
       name={name}
@@ -35,7 +36,7 @@ const DropzoneFileInput = ({name, onChangeHandler}) => {
  * @param {*} input 
  * @param {*} props 
  */
-const MultiFilesWithSingleField = ({input, meta, ...props}) => { 
+const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
   const allFiles = input.value || [];
 
   const onChangeHandler = (newSelectedFiles, e) => {
@@ -46,7 +47,7 @@ const MultiFilesWithSingleField = ({input, meta, ...props}) => {
 
     const filesAsObject = newSelectedFiles.map((file, index) => {
       return {
-        name: file.name + "some random text",
+        name: file.name,
         status: "not_uploaded"
       };
     });
@@ -57,6 +58,7 @@ const MultiFilesWithSingleField = ({input, meta, ...props}) => {
     <div>
       <DropzoneFileInput
         name={input.name}
+        multiple={false}
         onChangeHandler={onChangeHandler}
       />
       {meta.touched && meta.error && <span className="error">{meta.error}</span>}
@@ -69,8 +71,40 @@ const MultiFilesWithSingleField = ({input, meta, ...props}) => {
   )
 }
 
-const MultiFilesWithFielArray = () => {
-  
+const MultiFilesWithFielArray = ({ fields, meta }) => {
+  console.log("in MultiFilesWithFielArray");
+  console.log(fields, meta);
+  console.log("--------------------------")
+
+  const onChangeHandler = (newSelectedFiles, e) => {
+    console.log("in MultiFilesWithFielArray onchangehandler");
+    console.log(newSelectedFiles, e);
+    console.log("--------------------------")
+  }
+
+  console.log("----- showing all fields -----");
+  fields.map((field, index, fields) => {
+    console.log("field: ", field);
+    console.log("index: ", index);
+    console.log("all fields: ", fields);
+    console.log("all values: ", fields.getAll());
+  });
+  console.log("------------------------------");
+
+  return (
+    <div>
+      <Dropzone
+        name={name}
+        onDrop={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
+      >
+        <div>Try dropping some files here, or click to select files to upload.</div>
+      </Dropzone>
+      {/* <DropzoneFileInput
+        name={input.name}
+        onChangeHandler={onChangeHandler}
+      /> */}
+    </div>
+  );
 }
 
 
@@ -108,6 +142,15 @@ class FileUploader extends Component {
             component={MultiFilesWithSingleField}
           />
         </div>
+
+        <div>
+          <label htmlFor={FILE_FIELD_ARRAY_NAME}>Files array</label>
+          <FieldArray
+            name={FILE_FIELD_ARRAY_NAME}
+            component={MultiFilesWithFielArray}
+          />
+        </div>
+
         <div>
           <button type="submit">
             Submit
