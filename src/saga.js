@@ -1,4 +1,4 @@
-import { takeLatest, takeEvery } from 'redux-saga';
+import { /*takeLatest,*/ takeEvery } from 'redux-saga';
 
 export function* uploadSelectedFile(action) {
     console.log("In uploadSelectedFile saga");

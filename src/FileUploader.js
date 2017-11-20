@@ -71,38 +71,76 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
   )
 }
 
-const MultiFilesWithFielArray = ({ fields, meta }) => {
-  console.log("in MultiFilesWithFielArray");
-  console.log(fields, meta);
-  console.log("--------------------------")
+const DummyInput = (props) => {
+  return <input type="text" value={props.value} />
+}
 
-  const onChangeHandler = (newSelectedFiles, e) => {
-    console.log("in MultiFilesWithFielArray onchangehandler");
-    console.log(newSelectedFiles, e);
-    console.log("--------------------------")
+
+
+const MultiFilesWithFielArray = ({ fields, meta }) => {
+  // console.log("in MultiFilesWithFielArray");
+  // console.log(fields, meta);
+  // console.log("--------------------------")
+
+  // const onChangeHandler = (newSelectedFiles, e) => {
+  //   console.log("in MultiFilesWithFielArray onchangehandler");
+  //   console.log(newSelectedFiles, e);
+  //   console.log("--------------------------")
+  // }
+
+  // console.log("----- showing all fields -----");
+  // fields.forEach((field, index, fields) => {
+  //   console.log("field: ", field);
+  //   console.log("index: ", index);
+  //   console.log("all fields: ", fields);
+  //   console.log("all values: ", fields.getAll());
+  // });
+  // console.log("------------------------------");
+
+  // const onFileSelect = (selectedFiles, e) => {
+  //   console.log("in onFileSelect");
+  //   console.log(selectedFiles, e);
+  //   console.log("--------------------");
+  //   selectedFiles.forEach((aFile) => {
+  //     const fileObject = {
+  //       name: aFile.name,
+  //       size: aFile.size
+  //     };
+  //     fields.push(fileObject);
+  //   });
+  // }
+
+  // const randName = "rand" + Date.now();
+  // const onClick = (params) => {
+  //   fields.push()
+  // }
+
+
+  const showSelectedFiles = (field, fileObj) => {
+    if (fileObj.selected) {
+      console.log("Rendering selected files");
+    }
+
+    return <ul />;
   }
 
-  console.log("----- showing all fields -----");
-  fields.map((field, index, fields) => {
-    console.log("field: ", field);
-    console.log("index: ", index);
-    console.log("all fields: ", fields);
-    console.log("all values: ", fields.getAll());
-  });
-  console.log("------------------------------");
+  const showDropArea = (fieldName, fileObj) => {
+    if (!fileObj.selected) {
+      return <Field
+        name={fieldName}
+        component={MultiFilesWithSingleField} />;
+    }
+  }
 
   return (
     <div>
-      <Dropzone
-        name={name}
-        onDrop={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
-      >
-        <div>Try dropping some files here, or click to select files to upload.</div>
-      </Dropzone>
-      {/* <DropzoneFileInput
-        name={input.name}
-        onChangeHandler={onChangeHandler}
-      /> */}
+      {fields.map((field, index) => {
+        const value = fields.get(index);
+        return <span key={index}>
+          {showDropArea(field, value)}
+          {showSelectedFiles(field, value)}
+        </span>
+      })}
     </div>
   );
 }
@@ -135,13 +173,13 @@ class FileUploader extends Component {
     } = this.props;
     return (
       <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
-        <div>
+        {/* <div>
           <label htmlFor={FILE_FIELD_NAME}>Files</label>
           <Field
             name={FILE_FIELD_NAME}
             component={MultiFilesWithSingleField}
           />
-        </div>
+        </div> */}
 
         <div>
           <label htmlFor={FILE_FIELD_ARRAY_NAME}>Files array</label>

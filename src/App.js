@@ -5,7 +5,7 @@ class App extends React.Component {
   render() {
     const initialValues = {
       uploaded_files: [],
-      uploaded_file_array: [{selected:false, fileName:undefined}]
+      uploaded_file_array: [{selected:false}]
     }
     return <FileUploader initialValues={initialValues} />;
   }
