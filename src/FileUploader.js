@@ -37,36 +37,41 @@ const DropzoneFileInput = ({ name, onChangeHandler, ...props }) => {
  * @param {*} props 
  */
 const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
-  const allFiles = input.value || [];
-
   const onChangeHandler = (newSelectedFiles, e) => {
     // let files = input.value;
     console.log("in multiFilesInput onChangeHandler: ");
     console.log(newSelectedFiles, e);
     console.log("----------------------------------");
 
-    const filesAsObject = newSelectedFiles.map((file, index) => {
-      return {
-        name: file.name,
-        status: "not_uploaded"
-      };
-    });
-    input.onChange(allFiles.concat(filesAsObject));
+    // const filesAsObject = newSelectedFiles.map((file, index) => {
+    //   return {
+    //     name: file.name,
+    //     status: "not_uploaded"
+    //   };
+    // });
+    const fileObject = {
+      name: newSelectedFiles[0].name,
+      status: "not_uploaded",
+      selected: true
+    };
+    input.onChange(fileObject);
+    props.onSelect();
   }
 
   return (
     <div>
-      <DropzoneFileInput
+      <Dropzone
         name={input.name}
-        multiple={false}
-        onChangeHandler={onChangeHandler}
-      />
-      {meta.touched && meta.error && <span className="error">{meta.error}</span>}
+        onDrop={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
+      >
+        <div>Try dropping some files here, or click to select files to upload.</div>
+      </Dropzone>
+      {/* {meta.touched && meta.error && <span className="error">{meta.error}</span>}
       {allFiles && Array.isArray(allFiles) && (
         <ul>
           {allFiles.map((file, i) => <li key={i}>{file.name}</li>)}
         </ul>
-      )}
+      )} */}
     </div>
   )
 }
@@ -116,20 +121,33 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
   // }
 
 
-  const showSelectedFiles = (field, fileObj) => {
+  const showSelectedFiles = (field, fileObj, index, onRemove) => {
     if (fileObj.selected) {
       console.log("Rendering selected files");
+      const item = <li>
+        {fileObj.name}
+        <span onClick={() => onRemove(index)}>Remove this</span>
+      </li>;
+      return item;
     }
-
-    return <ul />;
+    return null;
   }
 
+  const onSelect = () => {
+    fields.push({selected:false});
+  }
   const showDropArea = (fieldName, fileObj) => {
     if (!fileObj.selected) {
       return <Field
         name={fieldName}
-        component={MultiFilesWithSingleField} />;
+        component={MultiFilesWithSingleField} 
+        onSelect={onSelect} />;
     }
+  }
+
+  const onRemove = (index) => {
+    console.log("Removing index: ", index);
+    fields.remove(index);
   }
 
   return (
@@ -138,7 +156,9 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
         const value = fields.get(index);
         return <span key={index}>
           {showDropArea(field, value)}
-          {showSelectedFiles(field, value)}
+          <ul>
+            {showSelectedFiles(field, value, index, onRemove)}
+          </ul>
         </span>
       })}
     </div>
