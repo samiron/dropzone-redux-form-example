@@ -1,5 +1,6 @@
 import { takeLatest, takeEvery } from 'redux-saga';
 import { put } from 'redux-saga/effects';
+import { arrayRemove, change } from 'redux-form';
 
 
 const FINISHED_UPLOADING = "FINISHED_UPLOADING";
@@ -29,16 +30,19 @@ export function* fileUploadFinished(action) {
     console.log("--------------------");
     const payload = Object.assign({}, action.payload, { secret: "key", selected: true });
     console.log("payload: ", payload, "meta:", action.meta);
-    yield put({
-        type: '@@redux-form/CHANGE',
-        meta:action.meta,
-        payload:payload
-    });
+    const changeAction = change(action.meta.form, action.meta.field, payload);
+    console.log("CHANGE ACTION: ", changeAction);
+    yield put(changeAction);
 }
 
 export function* fileUploadFailed(action){
     console.log("saga: FAILED FILE UPLOAD");
-
+    const formName = action.meta.form;
+    const found = /(.*)\[(\d+)\]/.exec(action.meta.field);
+    console.log("Found: ", found);
+    const fieldName = found[1];
+    const index = found[2];
+    yield put(arrayRemove(action.meta.form, fieldName, index));
 }
 
 export default function* watcher() {

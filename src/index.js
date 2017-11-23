@@ -13,7 +13,6 @@ const sagaMiddleware = createSagaMiddleware();
 
 const reducer = combineReducers({
   form: formReducer,
-  "form.simple": exampleReducer
 });
 
 function configureStore(initialState) {
