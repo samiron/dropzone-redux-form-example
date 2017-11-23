@@ -18,13 +18,15 @@ const FILE_FIELD_ARRAY_NAME = 'uploaded_file_array';
  *     webkitRelativePath:""
  * }
  */
-const DropzoneFileInput = ({ name, onChangeHandler, ...props }) => {
+const DropzoneFileInput = ({ name, onChangeHandler, textElement, ...props }) => {
   return (
     <Dropzone
+      {...props}
       name={name}
-      onDrop={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
+      className="dropzoneclass"
+      onDropAccepted={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
     >
-      <div>Try dropping some files here, or click to select files to upload.</div>
+      {textElement}
     </Dropzone>
   );
 }
@@ -37,7 +39,6 @@ const DropzoneFileInput = ({ name, onChangeHandler, ...props }) => {
  * @param {*} props 
  */
 const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
-  const allFiles = input.value || [];
 
   const onChangeHandler = (newSelectedFiles, e) => {
     // let files = input.value;
@@ -45,37 +46,39 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
     console.log(newSelectedFiles, e);
     console.log("----------------------------------");
 
-    const filesAsObject = newSelectedFiles.map((file, index) => {
-      return {
-        name: file.name,
-        status: "not_uploaded"
-      };
+    // const filesAsObject = newSelectedFiles.map((file, index) => {
+    //   return {
+    //     name: file.name,
+    //     status: "not_uploaded"
+    //   };
+    // });
+    const aFile = newSelectedFiles[0];
+    input.onChange({
+      name: aFile.name,
+      status: "not_uploaded"
     });
-    input.onChange(allFiles.concat(filesAsObject));
+    props.onSelect();
   }
+
 
   return (
     <div>
-      <DropzoneFileInput
-        name={input.name}
-        multiple={false}
-        onChangeHandler={onChangeHandler}
-      />
-      {meta.touched && meta.error && <span className="error">{meta.error}</span>}
-      {allFiles && Array.isArray(allFiles) && (
+      <Dropzone
+        name={name}
+        className="dropzoneclass"
+        onDropAccepted={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
+      >
+        {props.visibleElement}
+      </Dropzone>
+      {/* {meta.touched && meta.error && <span className="error">{meta.error}</span>}
+      {/* {allFiles && Array.isArray(allFiles) && (
         <ul>
           {allFiles.map((file, i) => <li key={i}>{file.name}</li>)}
         </ul>
-      )}
+      )} */}
     </div>
   )
 }
-
-const DummyInput = (props) => {
-  return <input type="text" value={props.value} />
-}
-
-
 
 const MultiFilesWithFielArray = ({ fields, meta }) => {
   // console.log("in MultiFilesWithFielArray");
@@ -118,27 +121,30 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
 
   const showSelectedFiles = (field, fileObj) => {
     if (fileObj.selected) {
-      console.log("Rendering selected files");
+      console.log("*************************Rendering selected files***********************");
     }
-
-    return <ul />;
+    return fileObj.name;
   }
 
-  const showDropArea = (fieldName, fileObj) => {
-    if (!fileObj.selected) {
-      return <Field
-        name={fieldName}
-        component={MultiFilesWithSingleField} />;
-    }
+  const onSelect = () => {
+    fields.push({ selected: false });
   }
+  
+  const visibleElement = <span className="uploadtext">DROP HERE</span>;  
+  const showDropArea = (fieldName, fileObj) => (
+    <Field
+      name={fieldName}
+      component={MultiFilesWithSingleField}
+      onSelect={onSelect} 
+      visibleElement={visibleElement} />
+  )
 
   return (
     <div>
       {fields.map((field, index) => {
         const value = fields.get(index);
         return <span key={index}>
-          {showDropArea(field, value)}
-          {showSelectedFiles(field, value)}
+          {value.selected ? showSelectedFiles(field, value) : showDropArea(field)}
         </span>
       })}
     </div>
