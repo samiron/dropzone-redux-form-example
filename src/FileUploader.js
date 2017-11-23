@@ -39,7 +39,6 @@ const DropzoneFileInput = ({ name, onChangeHandler, textElement, ...props }) => 
  * @param {*} props 
  */
 const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
-
   const onChangeHandler = (newSelectedFiles, e) => {
     // let files = input.value;
     console.log("in multiFilesInput onChangeHandler: ");
@@ -52,11 +51,12 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
     //     status: "not_uploaded"
     //   };
     // });
-    const aFile = newSelectedFiles[0];
-    input.onChange({
-      name: aFile.name,
-      status: "not_uploaded"
-    });
+    const fileObject = {
+      name: newSelectedFiles[0].name,
+      status: "not_uploaded",
+      selected: true
+    };
+    input.onChange(fileObject);
     props.onSelect();
   }
 
@@ -119,15 +119,28 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
   // }
 
 
-  const showSelectedFiles = (field, fileObj) => {
+  const showSelectedFiles = (field, fileObj, index, onRemove) => {
     if (fileObj.selected) {
-      console.log("*************************Rendering selected files***********************");
+      console.log("Rendering selected files");
+      const item = <li>
+        {fileObj.name}
+        <span onClick={() => onRemove(index)}>Remove this</span>
+      </li>;
+      return item;
     }
-    return fileObj.name;
+    return null;
   }
 
   const onSelect = () => {
-    fields.push({ selected: false });
+    fields.push({selected:false});
+  }
+  const showDropArea = (fieldName, fileObj) => {
+    if (!fileObj.selected) {
+      return <Field
+        name={fieldName}
+        component={MultiFilesWithSingleField} 
+        onSelect={onSelect} />;
+    }
   }
   
   const visibleElement = <span className="uploadtext">DROP HERE</span>;  
@@ -139,12 +152,20 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
       visibleElement={visibleElement} />
   )
 
+  const onRemove = (index) => {
+    console.log("Removing index: ", index);
+    fields.remove(index);
+  }
+
   return (
     <div>
       {fields.map((field, index) => {
         const value = fields.get(index);
         return <span key={index}>
-          {value.selected ? showSelectedFiles(field, value) : showDropArea(field)}
+          {showDropArea(field, value)}
+          <ul>
+            {showSelectedFiles(field, value, index, onRemove)}
+          </ul>
         </span>
       })}
     </div>
