@@ -132,25 +132,19 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
   }
 
   const onSelect = () => {
-    fields.push({selected:false});
+    fields.push({ selected: false });
   }
+
+  const visibleElement = <span className="uploadtext">DROP HERE</span>;
   const showDropArea = (fieldName, fileObj) => {
     if (!fileObj.selected) {
       return <Field
         name={fieldName}
-        component={MultiFilesWithSingleField} 
-        onSelect={onSelect} />;
+        component={MultiFilesWithSingleField}
+        onSelect={onSelect}
+        visibleElement={visibleElement} />
     }
   }
-  
-  const visibleElement = <span className="uploadtext">DROP HERE</span>;  
-  const showDropArea = (fieldName, fileObj) => (
-    <Field
-      name={fieldName}
-      component={MultiFilesWithSingleField}
-      onSelect={onSelect} 
-      visibleElement={visibleElement} />
-  )
 
   const onRemove = (index) => {
     console.log("Removing index: ", index);

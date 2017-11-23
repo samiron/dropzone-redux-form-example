@@ -6,12 +6,14 @@ import { reducer as formReducer, initialize, } from 'redux-form';
 import createSagaMiddleware from 'redux-saga';
 import saga from './saga';
 import App from './App';
+import exampleReducer from './reducer';
 
 // Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
 
 const reducer = combineReducers({
   form: formReducer,
+  "form.simple": exampleReducer
 });
 
 function configureStore(initialState) {
