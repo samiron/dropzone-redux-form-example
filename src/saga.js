@@ -38,11 +38,21 @@ export function* fileUploadFinished(action) {
 export function* fileUploadFailed(action){
     console.log("saga: FAILED FILE UPLOAD");
     const formName = action.meta.form;
-    const found = /(.*)\[(\d+)\]/.exec(action.meta.field);
-    console.log("Found: ", found);
-    const fieldName = found[1];
-    const index = found[2];
-    yield put(arrayRemove(action.meta.form, fieldName, index));
+    const matches = /(.*)\[(\d+)\]/.exec(action.meta.field);
+    console.log("Found: ", matches);
+
+    if(matches){
+        // Array file field. 
+        // We may want to reinitialize with empty file placeholder OR
+            // change(form, action.meta.field, EMPTY_FILE)
+        // Remove it.
+        const fieldName = matches[1];
+        const index = matches[2];
+        yield put(arrayRemove(action.meta.form, fieldName, index));
+    } else {
+        // Single file field
+        // change(form, action.meta.field, EMPTY_FILE)
+    }
 }
 
 export default function* watcher() {
