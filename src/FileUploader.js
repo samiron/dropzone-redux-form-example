@@ -17,21 +17,7 @@ const FILE_FIELD_ARRAY_NAME = 'uploaded_file_array';
  *     type: "image/jpeg"
  *     webkitRelativePath:""
  * }
- */
-const DropzoneFileInput = ({ name, onChangeHandler, textElement, ...props }) => {
-  return (
-    <Dropzone
-      {...props}
-      name={name}
-      className="dropzoneclass"
-      onDropAccepted={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
-    >
-      {textElement}
-    </Dropzone>
-  );
-}
-
-/**
+ * 
  * This will the component of redux-form Field
  * The value MUST be initialized as empty array.
  * Is usable with redux-form Field variable.
@@ -64,9 +50,12 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
   return (
     <div>
       <Dropzone
+        maxSize={1048576}
+        disablePreview={true}
         name={name}
         className="dropzoneclass"
         onDropAccepted={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
+        onDropRejected={(rejected) => console.log("Rejected: ", rejected)}
       >
         {props.visibleElement}
       </Dropzone>
@@ -80,71 +69,42 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
   )
 }
 
-const MultiFilesWithFielArray = ({ fields, meta }) => {
-  // console.log("in MultiFilesWithFielArray");
-  // console.log(fields, meta);
-  // console.log("--------------------------")
-
-  // const onChangeHandler = (newSelectedFiles, e) => {
-  //   console.log("in MultiFilesWithFielArray onchangehandler");
-  //   console.log(newSelectedFiles, e);
-  //   console.log("--------------------------")
-  // }
-
-  // console.log("----- showing all fields -----");
-  // fields.forEach((field, index, fields) => {
-  //   console.log("field: ", field);
-  //   console.log("index: ", index);
-  //   console.log("all fields: ", fields);
-  //   console.log("all values: ", fields.getAll());
-  // });
-  // console.log("------------------------------");
-
-  // const onFileSelect = (selectedFiles, e) => {
-  //   console.log("in onFileSelect");
-  //   console.log(selectedFiles, e);
-  //   console.log("--------------------");
-  //   selectedFiles.forEach((aFile) => {
-  //     const fileObject = {
-  //       name: aFile.name,
-  //       size: aFile.size
-  //     };
-  //     fields.push(fileObject);
-  //   });
-  // }
-
-  // const randName = "rand" + Date.now();
-  // const onClick = (params) => {
-  //   fields.push()
-  // }
+const renderSelectedFile = ({ field, meta, ...props }) => {
+  return <li>
+    {props.fileObject.name}
+    <span onClick={props.onRemove}>Remove this</span>
+  </li>
+};
 
 
-  const showSelectedFiles = (field, fileObj, index, onRemove) => {
-    if (fileObj.selected) {
-      console.log("Rendering selected files");
-      const item = <li>
-        {fileObj.name}
-        <span onClick={() => onRemove(index)}>Remove this</span>
-      </li>;
-      return item;
-    }
-    return null;
+const showSelectedFiles = (field, fileObj, index, onRemove) => {
+  if (fileObj.selected) {
+    console.log("Rendering selected files");
+    return <Field
+      name={field}
+      component={renderSelectedFile}
+      onRemove={() => onRemove(index)}
+      fileObject={fileObj}
+    />;  
+  }  
+  return null;
+}  
+
+const showDropArea = (fieldName, fileObj, onSelect) => {
+  const visibleElement = <span className="uploadtext">DROP HERE</span>;
+  if (!fileObj.selected) {
+    return <Field
+      name={fieldName}
+      component={MultiFilesWithSingleField}
+      onSelect={onSelect}
+      visibleElement={visibleElement} />
   }
+}
 
+const MultiFilesWithFielArray = ({ fields, meta }) => {
   const onSelect = () => {
     fields.push({ selected: false });
-  }
-
-  const visibleElement = <span className="uploadtext">DROP HERE</span>;
-  const showDropArea = (fieldName, fileObj) => {
-    if (!fileObj.selected) {
-      return <Field
-        name={fieldName}
-        component={MultiFilesWithSingleField}
-        onSelect={onSelect}
-        visibleElement={visibleElement} />
-    }
-  }
+  }  
 
   const onRemove = (index) => {
     console.log("Removing index: ", index);
@@ -156,7 +116,7 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
       {fields.map((field, index) => {
         const value = fields.get(index);
         return <span key={index}>
-          {showDropArea(field, value)}
+          {showDropArea(field, value, onSelect)}
           <ul>
             {showSelectedFiles(field, value, index, onRemove)}
           </ul>

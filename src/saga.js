@@ -6,7 +6,8 @@ import { arrayRemove, change } from 'redux-form';
 const FINISHED_UPLOADING = "FINISHED_UPLOADING";
 const FAILED_UPLOADING   = "FAILED_UPLOADING";
 
-const randomPass = () => ((Math.floor(Math.random() * 3) + 1) > 2) ? true : false;
+const randomSuccess = () => ((Math.floor(Math.random() * 3) + 1) > 2) ? FINISHED_UPLOADING : FAILED_UPLOADING;
+const uploadSuccessful = () => FINISHED_UPLOADING;
 
 export function* uploadSelectedFile(action) {
     if (action.payload.status === "not_uploaded") {
@@ -17,7 +18,7 @@ export function* uploadSelectedFile(action) {
         const payload = Object.assign({}, action.payload, { status: "uploaded", selected: true, fileUrl:"/file/LKAJLKJLKJLJ/"+action.payload.name });
 
         yield put({
-            type: (randomPass() ? FINISHED_UPLOADING : FAILED_UPLOADING),
+            type: uploadSuccessful(),
             payload: payload,
             meta: action.meta
         });
