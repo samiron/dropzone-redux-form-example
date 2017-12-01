@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 // import PropTypes from 'prop-types';
 import { reduxForm, Field, FieldArray } from 'redux-form';
 import Dropzone from 'react-dropzone';
+import { change } from 'redux-form';
 
 const FILE_FIELD_NAME = 'uploaded_files';
 const FILE_FIELD_ARRAY_NAME = 'uploaded_file_array';
@@ -25,6 +26,7 @@ const FILE_FIELD_ARRAY_NAME = 'uploaded_file_array';
  * @param {*} props 
  */
 const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
+  console.log("Rendering single file field");
   const onChangeHandler = (newSelectedFiles, e) => {
     // let files = input.value;
     console.log("in multiFilesInput onChangeHandler: ");
@@ -39,7 +41,7 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
     // });
     const fileObject = {
       name: newSelectedFiles[0].name,
-      status: "not_uploaded",
+      status: "selected",
       selected: true
     };
     input.onChange(fileObject);
@@ -69,7 +71,7 @@ const MultiFilesWithSingleField = ({ input, meta, ...props }) => {
   )
 }
 
-const renderSelectedFile = ({ field, meta, ...props }) => {
+const RenderSelectedFile = ({ field, meta, ...props }) => {
   return <li>
     {props.fileObject.name}
     <span onClick={props.onRemove}>Remove this</span>
@@ -78,33 +80,59 @@ const renderSelectedFile = ({ field, meta, ...props }) => {
 
 
 const showSelectedFiles = (field, fileObj, index, onRemove) => {
+  console.log("Rendering selected files");
   if (fileObj.selected) {
-    console.log("Rendering selected files");
+    console.log("file: " + fileObj.name);
+    // return <RenderSelectedFile
+    //   fileObject={fileObj}
+    //   onRemove={() => onRemove(index)}
+    // />
     return <Field
       name={field}
-      component={renderSelectedFile}
+      component={RenderSelectedFile}
       onRemove={() => onRemove(index)}
       fileObject={fileObj}
-    />;  
-  }  
-  return null;
-}  
-
-const showDropArea = (fieldName, fileObj, onSelect) => {
-  const visibleElement = <span className="uploadtext">DROP HERE</span>;
-  if (!fileObj.selected) {
-    return <Field
-      name={fieldName}
-      component={MultiFilesWithSingleField}
-      onSelect={onSelect}
-      visibleElement={visibleElement} />
+    />;
   }
+  return null;
 }
 
-const MultiFilesWithFielArray = ({ fields, meta }) => {
+const showDropArea = (fieldName, fileObj, onSelect) => {
+  console.log("Rendering drop area");
+  const visibleElement = <span className="uploadtext">DROP HERE</span>;
+  // if (!fileObj.selected) {
+  // if (fileObj.status && fileObj.status === "uploading") {
+  //   return <span>Uploading {fileObj.name}</span>;
+  // } else {
+  return <Field
+    name={fieldName}
+    component={MultiFilesWithSingleField}
+    onSelect={onSelect}
+    visibleElement={visibleElement} />
+  // }
+  // }
+
+}
+
+const StandAloneFileInput = () => {
+  return <Dropzone
+    maxSize={1048576}
+    disablePreview={true}
+    name={name}
+    className="dropzoneclass"
+    onDropAccepted={(filesToUpload, e) => onChangeHandler(filesToUpload, e)}
+    onDropRejected={(rejected) => console.log("Rejected: ", rejected)}
+  >
+    {props.visibleElement}
+  </Dropzone>
+}
+
+const MultiFilesWithFileArray = ({ fields, meta }) => {
+  console.log("Rendering the array");
+
   const onSelect = () => {
     fields.push({ selected: false });
-  }  
+  }
 
   const onRemove = (index) => {
     console.log("Removing index: ", index);
@@ -113,7 +141,8 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
 
   return (
     <div>
-      {fields.map((field, index) => {
+      <div><StandAloneFileInput /></div>
+      {/* {fields.map((field, index) => {
         const value = fields.get(index);
         return <span key={index}>
           {showDropArea(field, value, onSelect)}
@@ -121,11 +150,20 @@ const MultiFilesWithFielArray = ({ fields, meta }) => {
             {showSelectedFiles(field, value, index, onRemove)}
           </ul>
         </span>
-      })}
+      })} */}
     </div>
   );
 }
 
+const renderField = ({ input, label, type, meta: { touched, error } }) =>
+  <div>
+    <label>
+      {label}
+    </label>
+    <div>
+      <input {...input} type={type} placeholder={label} />
+    </div>
+  </div>
 
 
 class FileUploader extends Component {
@@ -145,6 +183,11 @@ class FileUploader extends Component {
       .then(res => res.json())
       .then(res => console.log(res))
       .catch(err => console.error(err));
+  };
+
+  dummyChange() {
+    console.log("calling dummy change");
+    return change('simple', 'uploaded_file_array[0]', { payload: { name: "changed: " + new Date().getTime() } });
   }
 
   render() {
@@ -162,11 +205,15 @@ class FileUploader extends Component {
           />
         </div> */}
 
+        {/* <div>
+          <Field name="single_field" type="text" component={renderField} label="Single Field" />
+        </div> */}
+
         <div>
           <label htmlFor={FILE_FIELD_ARRAY_NAME}>Files array</label>
           <FieldArray
             name={FILE_FIELD_ARRAY_NAME}
-            component={MultiFilesWithFielArray}
+            component={MultiFilesWithFileArray}
           />
         </div>
 

@@ -4,18 +4,18 @@ import { arrayRemove, change } from 'redux-form';
 
 
 const FINISHED_UPLOADING = "FINISHED_UPLOADING";
-const FAILED_UPLOADING   = "FAILED_UPLOADING";
+const FAILED_UPLOADING = "FAILED_UPLOADING";
 
 const randomSuccess = () => ((Math.floor(Math.random() * 3) + 1) > 2) ? FINISHED_UPLOADING : FAILED_UPLOADING;
 const uploadSuccessful = () => FINISHED_UPLOADING;
 
 export function* uploadSelectedFile(action) {
-    if (action.payload.status === "not_uploaded") {
+    if (false && action.payload.status === "not_uploaded") {
         console.log("In uploadSelectedFile saga");
         console.log(action);
         console.log("------------------------");
         /* API operations */
-        const payload = Object.assign({}, action.payload, { status: "uploaded", selected: true, fileUrl:"/file/LKAJLKJLKJLJ/"+action.payload.name });
+        const payload = Object.assign({}, action.payload, { status: "uploaded", selected: true, fileUrl: "/file/LKAJLKJLKJLJ/" + action.payload.name });
 
         yield put({
             type: uploadSuccessful(),
@@ -36,16 +36,16 @@ export function* fileUploadFinished(action) {
     yield put(changeAction);
 }
 
-export function* fileUploadFailed(action){
+export function* fileUploadFailed(action) {
     console.log("saga: FAILED FILE UPLOAD");
     const formName = action.meta.form;
     const matches = /(.*)\[(\d+)\]/.exec(action.meta.field);
     console.log("Found: ", matches);
 
-    if(matches){
+    if (matches) {
         // Array file field. 
         // We may want to reinitialize with empty file placeholder OR
-            // change(form, action.meta.field, EMPTY_FILE)
+        // change(form, action.meta.field, EMPTY_FILE)
         // Remove it.
         const fieldName = matches[1];
         const index = matches[2];

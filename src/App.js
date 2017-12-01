@@ -4,8 +4,8 @@ import FileUploader from './FileUploader';
 class App extends React.Component {
   render() {
     const initialValues = {
-      uploaded_files: [],
-      uploaded_file_array: [{selected:false}]
+      single_field: "initial",
+      uploaded_file_array: []
     }
     return <FileUploader initialValues={initialValues} />;
   }
